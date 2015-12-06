@@ -43,24 +43,27 @@ app.post('/',function(req,res) {
     });
 });
 
-app.delete('/restaurant_id/:id',function(req,res) {
+app.delete('/:field/:value',function(req,res) {
 	var restaurantSchema = require('./models/restaurant');
 	mongoose.connect(mongodbURL);
 	var db = mongoose.connection;
 	db.on('error', console.error.bind(console, 'connection error:'));
 	db.once('open', function (callback) {
 		var Restaurant = mongoose.model('Restaurant', restaurantSchema);
-		Restaurant.find({restaurant_id: req.params.id}).remove(function(err) {
+		var dObj = { };
+		dObj[req.params.field] = req.params.value;
+		Restaurant.find(dObj).remove(function(err) {
        		if (err) {
 				res.status(500).json(err);
 				throw err
 			}			
        		//console.log('Restaurant removed!')
        		db.close();
-			res.status(200).json({message: 'delete done', restaurant_id: req.params.id});
+			res.status(200).json({message: 'delete done', restaurant_id: req.params.value});
     	});
     });
 });
+
 
 app.get('/:field/:value', function(req,res) {
 	var restaurantSchema = require('./models/restaurant');
